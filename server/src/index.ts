@@ -11,8 +11,8 @@ let allSockets: User[] =  []
 
 wss.on("connection", (socket) => {
     console.log("user conected");
+
     socket.on("message", (message) => {
-        
         const parsedMessage = JSON.parse(message as unknown as string); //to fix ts issues
         if(parsedMessage.type === 'join'){
             console.log("inside join")
