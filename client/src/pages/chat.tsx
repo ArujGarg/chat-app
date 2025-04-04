@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from "react";
+import { useRoom } from "../context";
+
 
 export const Chat = () => {
 
     const [messages, setMessages] = useState(["hi there", "hello"]);
     const wsRef = useRef<WebSocket>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+    const { roomId } = useRoom(); 
 
     useEffect(() => {
         const ws = new WebSocket("ws://localhost:8080");
@@ -16,7 +19,7 @@ export const Chat = () => {
         ws.send(JSON.stringify({
             type: "join",
             payload: {
-            roomId: "red"
+                roomId: roomId
             }
         }))
         }
@@ -47,12 +50,14 @@ export const Chat = () => {
             <button onClick={(() => {
                 const message = inputRef.current != null ? inputRef.current.value : "" ;
                 console.log(message)
-                wsRef.current.send(JSON.stringify({
-                    type: "chat",
-                    payload: {
-                    message: message
-                    }
-                }))
+                if (wsRef.current){
+                    wsRef.current.send(JSON.stringify({
+                        type: "chat",
+                        payload: {
+                        message: message
+                        }
+                    }))
+                }
                 })} 
                 className="px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer">
                 Send
