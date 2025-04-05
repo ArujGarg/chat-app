@@ -7,7 +7,6 @@ interface User {
     room: string
 }
 
- let userCount = 0;
 
 let allSockets: User[] =  []
 
@@ -30,7 +29,12 @@ wss.on("connection", (socket) => {
                     type: 'chat',
                     payload: {
                         userId: parsedMessage.payload.userId,
-                        message: parsedMessage.payload.message
+                        message: parsedMessage.payload.message,
+                        username: parsedMessage.payload.username,
+                        time: new Date().toLocaleTimeString('en-GB', { 
+                                    hour: "2-digit", 
+                                    minute: "2-digit"
+                                })
                     }
                 }));
             })

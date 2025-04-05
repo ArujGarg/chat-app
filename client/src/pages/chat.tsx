@@ -1,6 +1,6 @@
 import { Chance } from 'chance'
 import { useEffect, useRef, useState } from "react";
-import { useRoom } from "../context";
+import { useRoom, useUsername } from "../context";
 import { Link } from "react-router-dom";
 
 let chance = new Chance();
@@ -8,11 +8,13 @@ interface Message {
     type: string,
     payload: {
         userId: string,
-        message: string
+        message: string,
+        username: string,
+        time: string
     }
 }
 
-const userId = chance.string();
+const userId = chance.string({length: 6});
 
 export const Chat = () => {
     const [userCount, setUserCount] = useState(0);
@@ -20,6 +22,9 @@ export const Chat = () => {
     const wsRef = useRef<WebSocket>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const { roomId } = useRoom(); 
+    const { username } = useUsername();
+    console.log(username)
+
 
     useEffect(() => {
         const ws = new WebSocket("ws://localhost:8080");
@@ -50,7 +55,33 @@ export const Chat = () => {
         wsRef.current = ws;
     }, [])
 
+    function sendMesssage(){
+        const message = inputRef.current != null ? inputRef.current.value : '';
+        if (message.trim() === '') return;
 
+        if (wsRef.current) {
+            wsRef.current.send(
+                JSON.stringify({
+                    type: 'chat',
+                    payload: {
+                        userId: userId,
+                        message: message,
+                        username: username,
+                        time: new Date().toLocaleTimeString('en-BG', { 
+                                            hour: "2-digit", 
+                                            minute: "2-digit"
+                                        })
+                    }
+                })
+            );
+        }
+    }
+
+    function handleKeyDown(event: React.KeyboardEvent<HTMLButtonElement>){
+        if(event.key === 'Enter'){
+            sendMesssage()
+        }
+    }
 
     return (
         <div className="h-screen flex flex-col items-center justify-center bg-gray-400 space-y-4">
@@ -73,8 +104,16 @@ export const Chat = () => {
                     className={`flex ${m.payload.userId === userId ? "justify-end" : "justify-start"} `}>
                         <div className={`p-2 rounded-lg max-w-xs 
                             ${m.payload.userId === userId ? 
-                            "bg-blue-500 text-white" : "bg-gray-300 text-gray"}`}>
-                                {m.payload.message}
+                            "bg-blue-500 text-white" : "bg-gray-300"}`}>
+                                <div className="text-xs font-bold">
+                                    {m.payload.username}
+                                </div>
+                                <div className="text-sm">
+                                    {m.payload.message}
+                                </div>
+                                <div className='text-xs text-right'>
+                                    {m.payload.time}
+                                </div>
                         </div>
                     </div>
                 ))}
@@ -89,22 +128,7 @@ export const Chat = () => {
                     className="flex-1 p-2 border rounded-md mr-2"
                 />
                 <button
-                    onClick={() => {
-                    const message = inputRef.current != null ? inputRef.current.value : '';
-                    if (message.trim() === '') return;
-
-                    if (wsRef.current) {
-                        wsRef.current.send(
-                            JSON.stringify({
-                                type: 'chat',
-                                payload: {
-                                    userId: userId,
-                                    message: message,
-                                }
-                            })
-                        );
-                    }
-                    }}
+                    onClick={sendMesssage}
                     className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
                 >
                     Send
