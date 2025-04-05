@@ -1,5 +1,5 @@
 import { Chance } from 'chance'
-import { useEffect, useRef, useState } from "react";
+import { Component, useEffect, useRef, useState } from "react";
 import { useRoom, useUsername } from "../context";
 import { Link } from "react-router-dom";
 
@@ -23,7 +23,7 @@ export const Chat = () => {
     const inputRef = useRef<HTMLInputElement>(null);
     const { roomId } = useRoom(); 
     const { username } = useUsername();
-    console.log(username)
+    const divRef = useRef<HTMLDivElement>(null);
 
 
     useEffect(() => {
@@ -52,8 +52,16 @@ export const Chat = () => {
             console.log('disconnected');
             setUserCount(userCount - 1);
         }
+
         wsRef.current = ws;
     }, [])
+
+    useEffect(() => {
+        if(divRef.current){
+            divRef.current.scrollTop = divRef.current.scrollHeight
+        }
+    }, [messages])
+
 
     function sendMesssage(){
         const message = inputRef.current != null ? inputRef.current.value : '';
@@ -98,11 +106,11 @@ export const Chat = () => {
                 </div>
 
                 {/* Message Area */}
-                <div className="flex-1 overflow-y-auto p-2 space-y-2 bg-gray-100 rounded-md">
+                <div ref={divRef} className="flex-1 overflow-y-auto p-2 space-y-2 bg-gray-100 rounded-md">
                 {messages.map((m, i) => (
                     <div key={i} 
                     className={`flex ${m.payload.userId === userId ? "justify-end" : "justify-start"} `}>
-                        <div className={`p-2 rounded-lg max-w-xs 
+                        <div className={`p-2 rounded-lg max-w-xs min-w-20
                             ${m.payload.userId === userId ? 
                             "bg-blue-500 text-white" : "bg-gray-300"}`}>
                                 <div className="text-xs font-bold">
