@@ -1,5 +1,5 @@
 import { Chance } from 'chance'
-import { Component, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRoom, useUsername } from "../context";
 import { Link } from "react-router-dom";
 
@@ -32,7 +32,12 @@ export const Chat = () => {
             console.log(event.data)
             try {
                 const parsedMessage = JSON.parse(event.data);
-                setMessages((prevMessages) => [...prevMessages, parsedMessage])
+                if(parsedMessage.type === "user_count"){
+                    setUserCount(parsedMessage.payload.userCount);
+                }
+                else {
+                    setMessages((prevMessages) => [...prevMessages, parsedMessage])
+                }
             } catch (error) {
                 console.error("error parsing message to JSON", error);
             }
@@ -45,14 +50,15 @@ export const Chat = () => {
                     roomId: roomId
                 }
             }))
-            setUserCount(userCount + 1);
         }
 
         ws.onclose = () => {
             console.log('disconnected');
-            setUserCount(userCount - 1);
         }
 
+        if(inputRef.current){
+            inputRef.current?.focus();
+        }
         wsRef.current = ws;
     }, [])
 
@@ -85,7 +91,7 @@ export const Chat = () => {
         }
     }
 
-    function handleKeyDown(event: React.KeyboardEvent<HTMLButtonElement>){
+    function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>){
         if(event.key === 'Enter'){
             sendMesssage()
         }
@@ -100,7 +106,7 @@ export const Chat = () => {
                 <div>Chat Room</div>
                 <div className="flex justify-between text-sm text-gray-500 font-normal">
                     <div>Joined: {userCount}</div>
-                    <div>UserId: {userId}</div>
+                    {/* can display userId here */}
                     <div>Room ID: {roomId}</div>
                 </div>
                 </div>
@@ -131,6 +137,7 @@ export const Chat = () => {
                 <div className="flex items-center border-t p-2 mt-2">
                 <input
                     ref={inputRef}
+                    onKeyDown={handleKeyDown}
                     type="text"
                     placeholder="Type a message..."
                     className="flex-1 p-2 border rounded-md mr-2"

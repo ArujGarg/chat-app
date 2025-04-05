@@ -19,7 +19,18 @@ wss.on("connection", (socket) => {
                 socket,
                 room: parsedMessage.payload.roomId
             })
+
+            const roomUsers = allSockets.filter((x) => x.room === parsedMessage.payload.roomId);
+            roomUsers.forEach((x) => {
+                x.socket.send(JSON.stringify({
+                    type: "user_count",
+                    payload: {
+                        userCount: roomUsers.length
+                    }
+                }))
+            })
         }
+
         if(parsedMessage.type === 'chat'){
             let currentUserRoom = allSockets.find((x) => x.socket == socket)?.room
             const usersWithSameRoom = allSockets.filter((x) => x.room == currentUserRoom);
@@ -41,10 +52,24 @@ wss.on("connection", (socket) => {
         }
     })
 
-})
+    socket.on("close", () => {
+        const userWhoLeft = allSockets.find((x) => x.socket === socket);
+        if(userWhoLeft){
+            const room = userWhoLeft.room
+            allSockets = allSockets.filter((x) => x.socket !== socket)
 
-wss.on("close", (socket: WebSocket) => {
-    allSockets = allSockets.filter((x) => x.socket != socket)
+            const usersWithSameRoom = allSockets.filter((x) => x.room === room);
+            usersWithSameRoom.forEach((x) => {
+                x.socket.send(JSON.stringify({
+                    type: "user_count",
+                    payload: {
+                        userCount: usersWithSameRoom.length
+                    }
+                }))
+            })
+        }
+    })
+
 })
 
 
