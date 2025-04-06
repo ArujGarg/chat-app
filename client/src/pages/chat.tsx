@@ -90,14 +90,15 @@ export const Chat = () => {
                 })
             );
         }
+
+        if(inputRef.current){
+            inputRef.current.value = "";
+        }
     }
 
     function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>){
         if(event.key === 'Enter'){
             sendMesssage();
-            if(inputRef.current){
-                inputRef.current.value = ""
-            }
         }
     }
 
