@@ -27,7 +27,7 @@ export const Chat = () => {
 
 
     useEffect(() => {
-        const ws = new WebSocket("ws://localhost:8080");
+        const ws = new WebSocket("wss://chat-app-sl5k.onrender.com");
         ws.onmessage = (event) => {
             console.log(event.data)
             try {

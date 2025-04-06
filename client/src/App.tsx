@@ -14,7 +14,7 @@ function App() {
     <NameContext.Provider value={{username, setUsername}}>
       <BrowserRouter>
           <Routes>
-            <Route path='/home' element={<Home />} />
+            <Route path='/' element={<Home />} />
             <Route path='/chat' element={<Chat />} />
           </Routes>
         </BrowserRouter>

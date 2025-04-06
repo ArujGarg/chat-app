@@ -1,6 +1,14 @@
 import { WebSocketServer, WebSocket } from "ws";
+import http from 'http'
+
 const port = process.env.PORT ? parseInt(process.env.PORT) : 8080
-const wss = new WebSocketServer({port});
+
+const server = http.createServer((req, res) => {
+    res.writeHead(200);
+    res.end("websocket server is running");
+})
+
+const wss = new WebSocketServer({server});
 
 interface User {
     socket: WebSocket
@@ -72,6 +80,9 @@ wss.on("connection", (socket: WebSocket) => {
 
 })
 
+server.listen(port, () => {
+    console.log("server is running on port ", port);
+})
 
 
 
