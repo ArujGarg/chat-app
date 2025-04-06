@@ -52,7 +52,8 @@ wss.on("connection", (socket: WebSocket) => {
                         username: parsedMessage.payload.username,
                         time: new Date().toLocaleTimeString('en-GB', { 
                                     hour: "2-digit", 
-                                    minute: "2-digit"
+                                    minute: "2-digit",
+                                    timeZone: 'Asia/Kolkata'
                                 })
                     }
                 }));

@@ -83,7 +83,8 @@ export const Chat = () => {
                         username: username,
                         time: new Date().toLocaleTimeString('en-BG', { 
                                             hour: "2-digit", 
-                                            minute: "2-digit"
+                                            minute: "2-digit",
+                                            timeZone: 'Asia/Kolkata'
                                         })
                     }
                 })
@@ -93,7 +94,10 @@ export const Chat = () => {
 
     function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>){
         if(event.key === 'Enter'){
-            sendMesssage()
+            sendMesssage();
+            if(inputRef.current){
+                inputRef.current.value = ""
+            }
         }
     }
 
