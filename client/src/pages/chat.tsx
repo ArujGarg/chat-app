@@ -152,7 +152,7 @@ export const Chat = () => {
             </div>
 
             {/* Disconnect Button (Outside Card) */}
-            <Link to={'/home'}>
+            <Link to={'/'}>
                 <button
                     onClick={() => {
                     if (wsRef.current) {
